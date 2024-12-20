@@ -22,7 +22,7 @@ class Ludusavi:
         
     def SetEnv(self):
         #flatpak env variables
-        self.Env = os.environ.copy
+        self.Env = os.environ.copy()
         if 'XDG_RUNTIME_DIR' not in self.Env:
             self.Env['XDG_RUNTIME_DIR'] = '/run/user/1000'
         if 'WAYLAND_DISPLAY' not in self.Env:
