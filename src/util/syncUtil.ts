@@ -10,6 +10,7 @@ export const onGameStart = async (appId: number) => {
         appState.pushRecentGame(appId, gameName);
     } else {
         console.error("Ludusavi: game not suppported", gameName);
+        getServerApi().callPluginMethod<{ msg: string,logLevel:string }>("console_log", { msg: "Ludusavi: game not suppported: " + gameName,logLevel:"error"})
     }
 
     appState.setState("current_game_id", appId);
@@ -37,7 +38,10 @@ export async function backupGames(gameNames: string[]) {
 
     // Start sync
     await getServerApi().callPluginMethod<{ game_name: string }>("backup_game", { game_name: gameNames[0] }).then(e => {
-        if (!e.success) console.error(e.result);
+        if (!e.success) {
+            getServerApi().callPluginMethod<{ msg: string,logLevel:string }>("console_log", { msg: e.result,logLevel:"error"})
+            console.error(e.result);
+        }
         return e;
     });
 
@@ -57,6 +61,7 @@ export async function backupGames(gameNames: string[]) {
 
         if (!status.success) {
             getServerApi().toaster.toast({ title: "Ludusavi", body: "An error occured while backing up. Check logs." });
+            getServerApi().callPluginMethod<{ msg: string,logLevel:string }>("console_log", { msg: status.result,logLevel:"error"})
             console.error(status.result);
             break;
         }
@@ -71,11 +76,13 @@ function handleComplete(start: Date, result: LudusaviBackupResponse) {
     if (result.errors) {
         if (result.errors.cloudConflict) {
             getServerApi().toaster.toast({ title: "⚠️ Ludusavi: Cloud Conflict", body: "Files out of sync with cloud." });
+            
         }
         if (result.errors.unknownGames) {
             getServerApi().toaster.toast({ title: "⚠️ Ludusavi: Unknown Game", body: result.errors.unknownGames[0] })
+            
         }
-
+       
         console.error(result.errors)
         return;
     }

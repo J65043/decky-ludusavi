@@ -31,7 +31,16 @@ class Plugin:
     async def verify_game_exists(self, game_name: str):
         decky_plugin.logger.debug("Executing: verify_game_exists(%s)", game_name)
         return { "exists": self.ludusavi.check_game(game_name) }
+    def console_log(self,msg:str,logLevel:str):
+        if logLevel == "error":
+            decky_plugin.logger.error("Frontend: ",msg)
+        elif logLevel == "info":
+            decky_plugin.logger.info("Frontend: ",msg)
+        elif logLevel == "debug":
+            decky_plugin.logger.debug("Frontend: ",msg)
     
+    def log_info(self,msg:str):
+        decky_plugin.logger.info(msg)
     async def backup_game(self, game_name: str):
         decky_plugin.logger.debug("Executing: backup_game(%s)", game_name)
         self.backup_task = asyncio.create_task(self.ludusavi.backup_game_async(game_name))
